@@ -4,13 +4,15 @@ package br.com.conseng.myfirstgooglemapsapp
  * Root elemento for Gson.
  * The json result of Goolgle Map Search has the following format>
  * {
+ *      "error_message" : "",
  *      "html_attributions" : [],
  *      "results" : [],
  *      "status" : "OK"
  * }
  * @see [https://developers.google.com/places/web-service/search?hl=pt-br]
  */
-data class PlacesRootClass(val html_attributions: List<String>,
+data class PlacesRootClass(val error_message: String?,
+                           val html_attributions: List<String>,
                            val results: List<QuerySearchNearbyResult>,
                            val status: String)
 

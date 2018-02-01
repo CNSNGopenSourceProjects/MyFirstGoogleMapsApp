@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -21,6 +22,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private val defaultLongitude: Double = 73.94
     private val defaultRadius: Int = 10000
     private val defaultType = "Hospitality"
+
+//    private var hitApi:HitApi? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +45,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        HitApi(this, defaultLatitude, defaultLongitude, defaultRadius, defaultType)
+        /*hitApi = */HitApi(this, defaultLatitude, defaultLongitude, defaultRadius, defaultType).execute()
     }
 
     /**
@@ -63,7 +66,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          * @return A result, defined by the subclass of this task.
          */
         override fun doInBackground(vararg params: Void?): String {
-            return GooglePlaceApis().getPlacesJson(context, latitude, longitude, radius, type)
+            val result = GooglePlaceApis().getPlacesJson(context, latitude, longitude, radius, type)
+            return result
         }
 
         /**
@@ -74,6 +78,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             super.onPostExecute(result)
             val gson = GsonBuilder().create()
             val root = gson.fromJson(result, PlacesRootClass::class.java)
+            if (root.status.equals("REQUEST_DENIED")) {
+                Toast.makeText(context, "ERROR: Access denied!", Toast.LENGTH_LONG).show()
+                println("ERROR: ${root.error_message}")
+            } else {
+                addMarkers(root)
+            }
         }
     }
 
